@@ -13,15 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
-const express_1 = __importDefault(require("express"));
+const express_1 = require("express");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const zod_1 = require("zod");
 const User_1 = require("../db/User");
+const middleware_1 = require("../middleware");
 const dotenv_1 = require("dotenv");
-const router = express_1.default.Router();
+const router = (0, express_1.Router)();
 exports.router = router;
 (0, dotenv_1.config)();
 const sercetkey = process.env.JWT_SECRET || '';
+// signup 
 const SignupSchema = zod_1.z.object({
     username: zod_1.z.string().email(),
     password: zod_1.z.string(),
@@ -44,12 +46,13 @@ router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function*
         return;
     }
     const user = yield (0, User_1.CreateUser)(req.body);
-    const token = jsonwebtoken_1.default.sign(user.username, sercetkey);
+    const token = jsonwebtoken_1.default.sign({ id: user.id }, sercetkey);
     res.status(200).json({
         message: 'User created successfully',
         token: token
     });
 }));
+// signin
 const SigninSchema = zod_1.z.object({
     username: zod_1.z.string().email(),
     password: zod_1.z.string(),
@@ -69,8 +72,27 @@ router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
         return;
     }
-    const token = jsonwebtoken_1.default.sign(req.body.username, sercetkey);
+    const token = jsonwebtoken_1.default.sign({ id: existingUser.id }, sercetkey);
     res.status(200).json({
         token: token
+    });
+}));
+// update user
+const UpdateSchema = zod_1.z.object({
+    firstname: zod_1.z.string().optional(),
+    lastname: zod_1.z.string().optional(),
+    password: zod_1.z.string().optional(),
+});
+router.put('/update', middleware_1.authmiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = UpdateSchema.safeParse(req.body);
+    if (!userData.success) {
+        res.status(400).json({
+            message: 'Invalid inputs'
+        });
+        return;
+    }
+    const user = yield (0, User_1.UpdateUser)(res.locals.id, req.body);
+    res.status(200).json({
+        message: 'Updated successfully',
     });
 }));

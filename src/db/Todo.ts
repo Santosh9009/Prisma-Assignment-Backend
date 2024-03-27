@@ -2,18 +2,25 @@ import { PrismaClient } from "@prisma/client";
 
 const Prisma = new PrismaClient();
 
-export async function CreateTodo(title: string, description: string , userid : number){
+interface Todo{
+  title: string, description: string 
+}
+
+export async function CreateTodo(todo: Todo,userid:number){
   await Prisma.todo.create({
     data:{
-      title: title,
-      description: description, 
+      title: todo.title,
+      description: todo.description, 
       userid: userid
     }
   })
 }
 
+interface data{
+  title?: string, description?: string
+}
 
-export async function UpdateTodo(id: number, title?: string, description?: string  ){
+export async function UpdateTodo(id: number, todo:data ){
  
   
   await Prisma.todo.update({
@@ -21,8 +28,8 @@ export async function UpdateTodo(id: number, title?: string, description?: strin
       id: id
     },
     data:{
-      title: title,
-      description: description
+      title: todo.title,
+      description: todo.description
     }
   })
 }
@@ -37,3 +44,12 @@ async function GetTodo(userid : number){
   })
   return todos;
 }
+
+async function DeleteTodo(userid : number, id:number){
+   await Prisma.todo.delete({
+     where:{
+      userid:userid,
+      id:id
+     }
+   })
+ }

@@ -19,7 +19,7 @@ export async function CreateUser(data: userData){
 }
 
 
-export async function GetUser(username : string){
+export async function GetUser(username: string){
  const user =  await Prisma.user.findUnique({
     where:{
       username: username
@@ -27,6 +27,24 @@ export async function GetUser(username : string){
   })
     return user
   }
+
+
+  interface update{
+    password?: string, firstname?: string, lastname ?: string
+  }
+
+  export async function UpdateUser(id: number, data: update){
+    const user = await Prisma.user.update({
+      where:{
+        id: id
+      },
+      data:{
+        ...data
+      }
+    })
+    return user;
+  }
+
 
 
 

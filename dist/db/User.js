@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetUser = exports.CreateUser = void 0;
+exports.UpdateUser = exports.GetUser = exports.CreateUser = void 0;
 const client_1 = require("@prisma/client");
 const Prisma = new client_1.PrismaClient();
 function CreateUser(data) {
@@ -37,3 +37,15 @@ function GetUser(username) {
     });
 }
 exports.GetUser = GetUser;
+function UpdateUser(id, data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield Prisma.user.update({
+            where: {
+                id: id
+            },
+            data: Object.assign({}, data)
+        });
+        return user;
+    });
+}
+exports.UpdateUser = UpdateUser;
