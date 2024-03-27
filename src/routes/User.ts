@@ -21,13 +21,15 @@ router.post('/signup',async(req,res)=>{
     res.status(400).json({
       message: 'Invalid inputs'
     })
+    return;
   }
 
-  const ExistingUser = await GetUser(req.body.username);
-  if(ExistingUser){
+  const existingUser = await GetUser(req.body.username);
+  if(existingUser){
     res.status(403).json({
       message:'User already exists'
     })
+    return;
   }
 
   const user = await CreateUser(req.body);
@@ -51,17 +53,23 @@ router.post('/signin', async(req,res)=>{
     res.status(400).json({
       message: 'Invalid inputs'
     })
+    return;
   }
 
-  const ExistingUser = await GetUser(req.body.username);
-  if(ExistingUser){
+  const existingUser = await GetUser(req.body.username);
+  if(!existingUser){
     res.status(403).json({
-      message:'User already exists'
+      message:'No user already exists'
     })
+    return;
   }
 
-  const user = GetUser(req.body.username)
+  const token = jwt.sign(req.body.username,sercetkey)
+  res.status(200).json({
+    token: token
+  })
 
+  
 })
 
 

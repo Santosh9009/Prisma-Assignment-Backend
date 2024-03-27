@@ -22,7 +22,6 @@ const router = express_1.default.Router();
 exports.router = router;
 (0, dotenv_1.config)();
 const sercetkey = process.env.JWT_SECRET || '';
-console.log(sercetkey);
 const SignupSchema = zod_1.z.object({
     username: zod_1.z.string().email(),
     password: zod_1.z.string(),
@@ -35,12 +34,14 @@ router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(400).json({
             message: 'Invalid inputs'
         });
+        return;
     }
-    const ExistingUser = yield (0, User_1.GetUser)(req.body.username);
-    if (ExistingUser) {
+    const existingUser = yield (0, User_1.GetUser)(req.body.username);
+    if (existingUser) {
         res.status(403).json({
             message: 'User already exists'
         });
+        return;
     }
     const user = yield (0, User_1.CreateUser)(req.body);
     const token = jsonwebtoken_1.default.sign(user.username, sercetkey);
@@ -59,12 +60,17 @@ router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(400).json({
             message: 'Invalid inputs'
         });
+        return;
     }
-    const ExistingUser = yield (0, User_1.GetUser)(req.body.username);
-    if (ExistingUser) {
+    const existingUser = yield (0, User_1.GetUser)(req.body.username);
+    if (!existingUser) {
         res.status(403).json({
-            message: 'User already exists'
+            message: 'No user already exists'
         });
+        return;
     }
-    const user = (0, User_1.GetUser)(req.body.username);
+    const token = jsonwebtoken_1.default.sign(req.body.username, sercetkey);
+    res.status(200).json({
+        token: token
+    });
 }));
