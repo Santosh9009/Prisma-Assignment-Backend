@@ -6,7 +6,7 @@ interface Todo{
   title: string, description: string 
 }
 
-export async function CreateTodo(todo: Todo,userid:number){
+export async function CreateTodo(userid:number,todo:Todo){
   await Prisma.todo.create({
     data:{
       title: todo.title,
@@ -28,15 +28,14 @@ export async function UpdateTodo(id: number, todo:data ){
       id: id
     },
     data:{
-      title: todo.title,
-      description: todo.description
+      ...todo
     }
   })
 }
 
 
 
-async function GetTodo(userid : number){
+export async function GetTodo(userid : number){
  const todos =  await Prisma.todo.findMany({
     where:{
       userid: userid
@@ -45,10 +44,10 @@ async function GetTodo(userid : number){
   return todos;
 }
 
-async function DeleteTodo(userid : number, id:number){
+
+export async function DeleteTodo( id:number){
    await Prisma.todo.delete({
      where:{
-      userid:userid,
       id:id
      }
    })

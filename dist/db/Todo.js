@@ -9,16 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateTodo = exports.CreateTodo = void 0;
+exports.DeleteTodo = exports.GetTodo = exports.UpdateTodo = exports.CreateTodo = void 0;
 const client_1 = require("@prisma/client");
 const Prisma = new client_1.PrismaClient();
-function CreateTodo(todo) {
+function CreateTodo(userid, todo) {
     return __awaiter(this, void 0, void 0, function* () {
         yield Prisma.todo.create({
             data: {
                 title: todo.title,
                 description: todo.description,
-                userid: todo.userid
+                userid: userid
             }
         });
     });
@@ -30,10 +30,7 @@ function UpdateTodo(id, todo) {
             where: {
                 id: id
             },
-            data: {
-                title: todo.title,
-                description: todo.description
-            }
+            data: Object.assign({}, todo)
         });
     });
 }
@@ -48,13 +45,14 @@ function GetTodo(userid) {
         return todos;
     });
 }
-function DeleteTodo(userid, id) {
+exports.GetTodo = GetTodo;
+function DeleteTodo(id) {
     return __awaiter(this, void 0, void 0, function* () {
         yield Prisma.todo.delete({
             where: {
-                userid: userid,
                 id: id
             }
         });
     });
 }
+exports.DeleteTodo = DeleteTodo;
